@@ -13,14 +13,80 @@ to the rising flank of the first information symbol.
 The target nRF52840 also outputs an SCK signal that is used as a trigger source for the logical analyzer capture. 
 The SCK signal can be disabled by setting SCK_PIN in main.c to NRFX_SPIM_PIN_NOT_USED.
 
-.. image:: doc/NEC_IR_packet.png
+.. image::  doc/NEC_IR_packet.png
 
 You can open `this <doc/NEC_IR_saleae_capture.sal>`_ capture file with Saleae's Logic 2.x SW if you want to study it further.
 
-The following snippet is the terminal output of the application when receiving packets from the companion `NEC IR Encoder application <https://github.com/haakonsh/NEC_IR_Encoder.git>`_:
+The following snippet is the terminal output of the application when receiving packets from the companion `NEC IR Encoder application <https://github.com/haakonsh/NEC_IR_Encoder.git>`_: 
+.. literal::
 
-.. include:: doc/terminal_output.txt
-    :code:
+    *** Booting Zephyr OS build v3.2.99-ncs1 ***
+    NEC IR packet received; Address: 240 Data: 103
+    NEC IR packet received; Address: 240 Data: 104
+    NEC IR packet received; Address: 240 Data: 105
+    NEC IR packet received; Address: 240 Data: 106
+    NEC IR packet received; Address: 240 Data: 107
+    NEC IR packet received; Address: 240 Data: 108
+    NEC IR packet received; Address: 240 Data: 109
+    NEC IR packet received; Address: 240 Data: 110
+    NEC IR packet received; Address: 240 Data: 111
+    NEC IR packet received; Address: 240 Data: 112
+    NEC IR packet received; Address: 240 Data: 113
+    NEC IR packet received; Address: 240 Data: 114
+    NEC IR packet received; Address: 240 Data: 115
+    NEC IR packet received; Address: 240 Data: 116
+    NEC IR packet received; Address: 240 Data: 117
+    NEC IR packet received; Address: 240 Data: 118
+    NEC IR packet received; Address: 240 Data: 119
+    NEC IR packet received; Address: 240 Data: 120
+    NEC IR packet received; Address: 240 Data: 121
+    [00:00:02.255,920] <inf> cpu_load: Load:4,534%
+    NEC IR packet received; Address: 240 Data: 122
+    NEC IR packet received; Address: 240 Data: 123
+    NEC IR packet received; Address: 240 Data: 124
+    NEC IR packet received; Address: 240 Data: 125
+    NEC IR packet received; Address: 240 Data: 126
+    NEC IR packet received; Address: 240 Data: 127
+    NEC IR packet received; Address: 240 Data: 128
+    NEC IR packet received; Address: 240 Data: 129
+    NEC IR packet received; Address: 240 Data: 130
+    NEC IR packet received; Address: 240 Data: 131
+    NEC IR packet received; Address: 240 Data: 132
+    NEC IR packet received; Address: 240 Data: 133
+    NEC IR packet received; Address: 240 Data: 134
+    NEC IR packet received; Address: 240 Data: 135
+    NEC IR packet received; Address: 240 Data: 136
+    NEC IR packet received; Address: 240 Data: 137
+    NEC IR packet received; Address: 240 Data: 138
+    NEC IR packet received; Address: 240 Data: 139
+    NEC IR packet received; Address: 240 Data: 140
+    NEC IR packet received; Address: 240 Data: 141
+    [00:00:04.256,072] <inf> cpu_load: Load:5,073%
+    NEC IR packet received; Address: 240 Data: 142
+    NEC IR packet received; Address: 240 Data: 143
+    NEC IR packet received; Address: 240 Data: 144
+    NEC IR packet received; Address: 240 Data: 145
+    NEC IR packet received; Address: 240 Data: 146
+    NEC IR packet received; Address: 240 Data: 147
+    NEC IR packet received; Address: 240 Data: 148
+    NEC IR packet received; Address: 240 Data: 149
+    NEC IR packet received; Address: 240 Data: 150
+    NEC IR packet received; Address: 240 Data: 151
+    NEC IR packet received; Address: 240 Data: 152
+    NEC IR packet received; Address: 240 Data: 153
+    NEC IR packet received; Address: 240 Data: 154
+    NEC IR packet received; Address: 240 Data: 155
+    NEC IR packet received; Address: 240 Data: 156
+    NEC IR packet received; Address: 240 Data: 157
+    NEC IR packet received; Address: 240 Data: 158
+    NEC IR packet received; Address: 240 Data: 159
+    NEC IR packet received; Address: 240 Data: 160
+    NEC IR packet received; Address: 240 Data: 161
+    [00:00:06.256,225] <inf> cpu_load: Load:5,102%
+    NEC IR packet received; Address: 240 Data: 162
+    NEC IR packet received; Address: 240 Data: 163
+    NEC IR packet received; Address: 240 Data: 164
+    Disconnected
 
 Note that the log module uses the vast majority of the CPU load.
 
