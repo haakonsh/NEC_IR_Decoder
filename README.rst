@@ -6,6 +6,8 @@ Overview
 ********
 This application will capture NEC IR Encoded frames on MISO_PIN using the nRF52840's SPIM0 peripheral.
 
+.. image:: doc/NEC_IR_packet.png
+
 Requirements
 ************
 nRF52840 series device with at least one available SPIM peripheral. NCS v2.2.0 SDK or newer. 
@@ -17,7 +19,8 @@ Using the nRF Connect for VS Code extension:
 Click the '+' button labeled "nRF Connect: Add Folder As Application" in the APPLICATIONS pane.
 You will need to hover over the pane beyfore the button row will appear.
 
-Add a build configuration for your nRF52840 device, then build and flash the device.
+Add a build configuration for your nRF52840 device, then build and flash the device. 
+Connect your nRF52840 device to an appropriate terminal to view the received data. 
 
 Additional info
 ***************
