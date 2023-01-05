@@ -20,6 +20,7 @@ You can open `this <doc/NEC_IR_saleae_capture.sal>`_ capture file with Saleae's 
 The following snippet is the terminal output of the application when receiving packets from the companion `NEC IR Encoder application <https://github.com/haakonsh/NEC_IR_Encoder.git>`_:
 
 .. include:: doc/terminal_output.txt
+    :code:
 
 Note that the log module uses the vast majority of the CPU load.
 
