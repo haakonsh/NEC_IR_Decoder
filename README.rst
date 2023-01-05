@@ -17,7 +17,7 @@ The SCK signal can be disabled by setting SCK_PIN in main.c to NRFX_SPIM_PIN_NOT
 
 You can open `this <doc/NEC_IR_saleae_capture.sal>`_ capture file with Saleae's Logic 2.x SW if you want to study it further.
 
-The following snippet is the terminal output of the application when receiving packets from the companion NEC IR Encoder application, found `here <https://github.com/haakonsh/NEC_IR_Encoder.git>`_:
+The following snippet is the terminal output of the application when receiving packets from the companion `NEC IR Encoder application <https://github.com/haakonsh/NEC_IR_Encoder.git>`_:
 
 .. include:: doc/terminal_output.txt
     :literal:
