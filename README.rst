@@ -18,7 +18,9 @@ You can open `this <doc/NEC_IR_saleae_capture.sal>`_ capture file with Saleae's 
 
 Here is the start the terminal output of the application when receiving packets from the companion NEC IR Encoder application,
  found `here <https://github.com/haakonsh/NEC_IR_Encoder.git>`_:
+
  .. literalinclude:: doc/terminal_output.txt
+    :language: txt
 
 Requirements
 ************
