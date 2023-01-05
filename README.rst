@@ -6,8 +6,8 @@ Overview
 ********
 This application will capture NEC IR Encoded frames on MISO_PIN using the nRF52840's SPIM0 peripheral.
 
-The following logical analyzer capture (using a Saleae Logic PRO 8 with the NEC Decoder extension) shows how the target nRF52840's SPIM 
-starts a transfer after detecting a start frame condition (logic high pulse of at least 7.5ms on MISO_PIN), synchronized
+The following logical analyzer capture (using a Saleae Logic PRO 8 with the NEC Decoder extension) shows the target nRF52840's SPIM 
+starting an SPIM transfer after detecting an NEC IR Start Frame condition (logic high pulse of at least 7.5ms on MISO_PIN), synchronized
 to the rising flank of the first information symbol. 
 
 The target nRF52840 also outputs an SCK signal that is used as a trigger source for the logical analyzer capture. 
@@ -16,6 +16,10 @@ The SCK signal can be disabled by setting SCK_PIN in main.c to NRFX_SPIM_PIN_NOT
 .. image::  doc/NEC_IR_packet.png
 
 You can open `this <doc/NEC_IR_saleae_capture.sal>`_ capture file with Saleae's Logic 2.x SW if you want to study it further.
+
+The Start Frame is detected by the COMPARE0 event. If an input pulse is shorter than 7.5ms the RTC is stopped and cleared before the COMPARE0 event can enable the SPIM START task.
+
+.. image:: doc/state_machine.png
 
 The following snippet is the terminal output of the application when receiving packets from the companion `NEC IR Encoder application <https://github.com/haakonsh/NEC_IR_Encoder.git>`_: 
 ::
