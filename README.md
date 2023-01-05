@@ -1,45 +1,28 @@
-# SPIM basic non-blocking example overview {#spim_basic_non_blocking}
 
-The sample demonstrates a basic functionality of the nrfx_spim driver operating in the non-blocking mode.
+NEC IR Decoder
+######
 
-## Requirements
+Overview
+********
+This application will capture NEC IR Encoded frames on MISO_PIN using the nRF52840's SPIM0 peripheral.
 
-The sample supports the following development kits:
+Requirements
+************
+nRF52840 series device with at least one available SPIM peripheral. NCS v2.2.0 SDK or newer. 
 
-| **Board**           | **Support** |
-|---------------------|:-----------:|
-| nrf52dk_nrf52832    |     Yes     |
-| nrf52833dk_nrf52833 |     Yes     |
-| nrf52840dk_nrf52840 |     Yes     |
-| nrf5340dk_nrf5340   |     Yes     |
-| nrf9160dk_nrf9160   |     Yes     |
+Building and Running
+********************
+Using the nRF Connect for VS Code extension:
 
-## Overview
+Click the '+' button labeled "nRF Connect: Add Folder As Application" in the APPLICATIONS pane.
+You will need to hover over the pane beyfore the button row will appear.
 
-Application initializes the nrfx_spim driver and starts operating in the non-blocking mode.
-A specified message ( @p MSG_TO_SEND ) from @p m_tx_buffer is transmitted.
-When the transfer finishes @p spim_handler(), the received message is read from @p m_rx_buffer.
+Add a build configuration for your nRF52840 device, then build and flash the device.
 
-> For more information, see **SPIM driver - nrfx documentation**.
+Additional info
+***************
+nRF52840 has 16-bit buffer sizes for the SPIM peripheral vs nRF52832's 8-bit. Even at the lowest SPI frequencies an NEC IR encoded packet will need ~900 bytes. The SPIM's 'RXD.LIST register<https://infocenter.nordicsemi.com/topic/com.nordic.infocenter.nrf52832.ps.v1.1/spim.html?cp=4_2_0_30_5_11#register.RXD.LIST>' can be used to increase the buffer size to fully capture the whole packet, but it is not implemented. See 'EasyDMA list<https://infocenter.nordicsemi.com/topic/com.nordic.infocenter.nrf52832.ps.v1.1/spim.html?cp=4_2_0_30_1_0#topic>' chapter for more information.
 
-## Wiring
+`NEC IR protocol appnote from Altium <https://techdocs.altium.com/display/FPGA/NEC%2bInfrared%2bTransmission%2bProtocol>`.
 
-To run the sample correctly, connect pins as follows:
-* `LOOPBACK_PIN_1A` with `LOOPBACK_PIN_1B`.
-
-> Refer to pin definitions in `common/nrfx_example.h`.
-
-You should monitor the output from the board to check if it is as expected.
-
-## Building and running
-
-To run this sample, build it for the appropriate board and then flash it as per instructions in [Building and running](@ref building_and_running) section.
-## Sample output
-
-You should see the following output:
-
-```
-- "Starting nrfx_spim basic non-blocking example."
-- "SPIM finished. Context passed to the handler: >Some context<"
-- "Message received: Nordic Semiconductor"
-```
+I recommend the NEC Decoder extension for Saleae Logic 2 if you need to decode NEC IR packets.
