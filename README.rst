@@ -25,7 +25,7 @@ A companion NEC IR Encoder application can be found `here <https://github.com/ha
 
 nRF52840 has 16-bit buffer sizes for the SPIM peripheral vs nRF52832's 8-bit. Even at the lowest SPI frequencies an NEC IR encoded packet will need ~900 bytes. 
 The SPIM's `RXD.LIST <https://infocenter.nordicsemi.com/topic/com.nordic.infocenter.nrf52832.ps.v1.1/spim.html?cp=4_2_0_30_5_11#register.RXD.LIST>`_ register can be used to increase the buffer size to fully capture the whole packet, but it is not implemented.
-See 'EasyDMA list <https://infocenter.nordicsemi.com/topic/com.nordic.infocenter.nrf52832.ps.v1.1/spim.html?cp=4_2_0_30_1_0#topic>`_ chapter for more information.
+See `EasyDMA list <https://infocenter.nordicsemi.com/topic/com.nordic.infocenter.nrf52832.ps.v1.1/spim.html?cp=4_2_0_30_1_0#topic>`_ chapter for more information.
 
 `NEC IR protocol appnote from Altium <https://techdocs.altium.com/display/FPGA/NEC%2bInfrared%2bTransmission%2bProtocol>`_.
 
