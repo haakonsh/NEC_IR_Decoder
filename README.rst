@@ -11,15 +11,17 @@ starts a transfer after detecting a start frame condition (logic high pulse of a
 to the rising flank of the first information symbol. 
 
 The target nRF52840 also outputs an SCK signal that is used as a trigger source for the logical analyzer capture. 
-The SCK signal can be disabled by setting SCK_PIN in main.c to NRFX_SPIM_PIN_NOT_USED. 
+The SCK signal can be disabled by setting SCK_PIN in main.c to NRFX_SPIM_PIN_NOT_USED.
 .. image:: doc/NEC_IR_packet.png
 
 You can open `this <doc/NEC_IR_saleae_capture.sal>`_ capture file with Saleae's Logic 2.x SW if you want to study it further.
 
 The following snippet is the terminal output of the application when receiving packets from the companion NEC IR Encoder application, found `here <https://github.com/haakonsh/NEC_IR_Encoder.git>`_:
 
- .. literalinclude:: doc/terminal_output.txt
-    :language: txt
+.. include:: doc/terminal_output.txt
+    :literal:
+
+Note that the log module uses the vast majority of the CPU load.
 
 Requirements
 ************
