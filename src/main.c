@@ -107,11 +107,12 @@ static uint8_t m_rx_buffer[SPIM_BUF_SIZE];
 static uint8_t nec_ir_buffer[SPIM_BUF_SIZE];
 bool nec_ir_transfer_done = false;
 
-/*struct nec_ir_data_t {
+K_FIFO_DEFINE(spim_fifo);
+struct nec_ir_data_t {
     void *fifo_reserved;
-    uint8_t data[SPIM_BUF_SIZE];
     uint16_t len;
-};*/
+    uint8_t data[SPIM_BUF_SIZE];
+};
 
 nrfx_spim_xfer_desc_t spim_xfer_desc = NRFX_SPIM_XFER_TRX(m_tx_buffer, sizeof(m_tx_buffer),
                                                           m_rx_buffer, sizeof(m_rx_buffer));
@@ -122,11 +123,20 @@ static void spim_handler(nrfx_spim_evt_t const * p_event, void * p_context)
 {   
     if (p_event->type == NRFX_SPIM_EVENT_DONE)
     {        
-        nec_ir_transfer_done = true;       
+        size_t size = sizeof(struct nec_ir_data_t);
+        struct nec_ir_data_t spim_data = { .len = p_event->xfer_desc.rx_length};
+
+        char *mem_ptr = k_malloc(size);
+        __ASSERT_NO_MSG(mem_ptr != 0);
+            
+        memcpy(mem_ptr, &spim_data, sizeof(spim_data.fifo_reserved) + sizeof(spim_data.len));
+        memcpy(mem_ptr + sizeof(spim_data.fifo_reserved) + sizeof(spim_data.len), p_event->xfer_desc.p_rx_buffer, sizeof(spim_data.data));
+
+        k_fifo_put(&spim_fifo, mem_ptr);
     }
 }
 
-void nec_ir_decode(uint8_t * buf,uint16_t buf_size)
+void nec_ir_decode(void)
 {
     uint8_t     addr        = 0;
     uint8_t     data        = 0;
@@ -135,66 +145,81 @@ void nec_ir_decode(uint8_t * buf,uint16_t buf_size)
     uint32_t    packet      = 0;
     //static uint8_t packet_loss_check = 0;
 
-    /* 
-     * This loop counts the number of samples of value 0 that we've received in sucession,
-     * and evaluates whether we believe it is a logical 1 or 0. It does this for each 'bit'
-     * in the signal and builds a 32-bit vaiable representing the received packet
-     */
-    for(uint16_t i = 0; i < buf_size; i++)
+    while(1)
     {
-        if(buf[i] == 0)
+        struct nec_ir_data_t *spim_data = k_fifo_get(&spim_fifo, K_MSEC(70));
+        if(spim_data != NULL)
         {
-            zero_cnt++;
-        }
-        else
-        {
-            if(zero_cnt > 16)
+            /* 
+            * This loop counts the number of samples of value 0 that we've received in sucession,
+            * and evaluates whether we believe it is a logical 1 or 0. It does this for each 'bit'
+            * in the signal and builds a 32-bit vaiable representing the received packet
+            */
+            addr        = 0;
+            data        = 0;
+            zero_cnt    = 0;
+            bit_cnt     = 0;
+            packet      = 0;
+
+            for(uint16_t i = 0; i < spim_data->len; i++)
             {
-                //logic 1
-                packet |= (1 << bit_cnt++);
+                if(spim_data->data[i] == 0)
+                {
+                    zero_cnt++;
+                }
+                else
+                {
+                    if(zero_cnt > 16)
+                    {
+                        //logic 1
+                        packet |= (1 << bit_cnt++);
+                    }
+                    else if(zero_cnt > 4)
+                    {
+                        //logic 0
+                        bit_cnt++;
+                    }
+                    zero_cnt = 0;
+                }                 
             }
-            else if(zero_cnt > 4)
+
+            /*
+            * This block evaluates whether the address and data fields matches their respective logical inverses
+            */
+            if((((packet & 0x0000FF00) >> 8) + ((packet & 0x000000FF) >> 0)) == 0xFF)
             {
-                //logic 0
-                bit_cnt++;
+                addr = ((packet & 0x000000FF) >> 0);
             }
-            zero_cnt = 0;
-        }                 
-    }
+            else{LOG_INF("Address is not equal to its logical inverse! addr: %u  !addr: %u", addr, (packet & 0x0000FF00));}
 
-    /*
-     * This block evaluates whether the address and data fields matches their respective logical inverses
-     */
-    if((((packet & 0x0000FF00) >> 8) + ((packet & 0x000000FF) >> 0)) == 0xFF)
-    {
-        addr = ((packet & 0x000000FF) >> 0);
-    }
-    else{LOG_INF("Address is not equal to its logical inverse! addr: %u  !addr: %u", addr, (packet & 0x0000FF00));}
+            if((((packet & 0xFF000000) >> 24) + ((packet & 0x00FF0000) >> 16)) == 0xFF)
+            {
+                data = ((packet & 0x00FF0000) >> 16);
+            }
+            else{LOG_INF("Data is not equal to its logical inverse! data: %u  !data: %u", data, (packet & 0xFF000000));}
 
-    if((((packet & 0xFF000000) >> 24) + ((packet & 0x00FF0000) >> 16)) == 0xFF)
-    {
-        data = ((packet & 0x00FF0000) >> 16);
-    }
-    else{LOG_INF("Data is not equal to its logical inverse! data: %u  !data: %u", data, (packet & 0xFF000000));}
+            /*
+            * The test signal have a const address of 0xF0 and a data byte that increments for each packet sent. Remove in prod.
+            * Ref: https://github.com/haakonsh/NEC_IR_Encoder.git.
+            */
+            /*if((++packet_loss_check != data) || (addr != 0xF0))
+            {
+                LOG_INF("Packet lost!!!");
+                packet_loss_check = data;
+            }*/
 
-    /*
-     * The test signal have a const address of 0xF0 and a data byte that increments for each packet sent. Remove in prod.
-     * Ref: https://github.com/haakonsh/NEC_IR_Encoder.git.
-     */
-    /*if((++packet_loss_check != data) || (addr != 0xF0))
-    {
-        LOG_INF("Packet lost!!!");
-        packet_loss_check = data;
-    }*/
+            LOG_INF("NEC IR packet received; Address: %u Data: %u", addr, data);
 
-    printk("NEC IR packet received; Address: %u Data: %u\n", addr, data);
+            k_free(spim_data);
+        }       
+    }    
 }
 
 int main(void)
 {
     //Initialize the CPU load logger
     LOG_INIT();    
-    if(cpu_load_init() != 0)printk("cpu_load_init() failed!\n");
+    //if(cpu_load_init() != 0)printk("cpu_load_init() failed!\n");
 
     nrfx_err_t status;
     (void)status;    
@@ -312,28 +337,14 @@ int main(void)
     nrf_gpiote_event_enable(NRF_GPIOTE, gpiote_channel_up);
     nrf_gpiote_event_enable(NRF_GPIOTE, gpiote_channel_down);
 
-    while (1)
+    k_thread_priority_set(k_current_get(), 8);
+
+    while(1)
     {
-        if(nec_ir_transfer_done)
-        {   
-            nec_ir_transfer_done = false;
-
-            memcpy(nec_ir_buffer, m_rx_buffer , sizeof(nec_ir_buffer));
-            memset(m_rx_buffer, 0 , sizeof(m_rx_buffer));
-
-            status = nrfx_spim_xfer(&spim_inst, &spim_xfer_desc, NRFX_SPIM_FLAG_HOLD_XFER);
-            NRFX_ASSERT(status == NRFX_SUCCESS);
-
-            nec_ir_decode(nec_ir_buffer, sizeof(nec_ir_buffer));
-            
-            memset(nec_ir_buffer, 0 , sizeof(nec_ir_buffer));                                
-        }
-        // Go to sleep unless there are pending logs that need to be processed by the log module.
-        if(LOG_PROCESS() == false)
-        {
-            k_cpu_idle();
-        }
+        k_sleep(K_FOREVER);
     }
 }
+
+K_THREAD_DEFINE(nec_ir_decode_id, 1024, nec_ir_decode, NULL, NULL, NULL, 7, 0, 0);
 
 /** @} */

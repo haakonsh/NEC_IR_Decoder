@@ -92,7 +92,9 @@ The following snippet is the terminal output of the application when receiving p
         NEC IR packet received; Address: 240 Data: 164
         Disconnected
 
-Note that the log module uses the vast majority of the CPU load.
+Note that the printk/log module uses the vast majority of the CPU load.
+nec_ir_decode() has an average runtime of 366us +/- one LFCLK tick(30.51us), per packet. 
+spim_handler() + SPIM ISR uses 1 LFCLK tick per packet.
 
 Requirements
 ************
