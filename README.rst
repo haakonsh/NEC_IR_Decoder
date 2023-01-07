@@ -94,7 +94,7 @@ The following snippet is the terminal output of the application when receiving p
 
 Note that the printk/log module uses the vast majority of the CPU load.
 nec_ir_decode() has an average runtime of 366us +/- one LFCLK tick(30.51us), per packet. 
-spim_handler() + SPIM ISR uses 1 LFCLK tick per packet.
+spim_handler() + SPIM ISR uses 1 LFCLK tick per packet. This is measured with SEGGER SystemView
 
 Requirements
 ************
@@ -111,8 +111,17 @@ You will need to hover over the pane beyfore the button row will appear.
 Add a build configuration for your nRF52840 device, then build and flash the device. 
 Connect your nRF52840 device to an appropriate terminal to view the received data. 
 
+prj.conf has a fair bit of debug options enabled, as well as settings for the FIFO buffer queue. 
+Currently the FIFO heap is set to 8kB in order to fit 8 SPIM buffers.
+
 Additional info
 ***************
+Disclaimer:
+This application has not undergone extensive testing and there is currently one out-of-spec violation: 
+One GPIO can only be assigned to one GPIOTE channel. In this application the MISO pin is assigned to both gpiote_channel_up and gpiote_channel_down.
+To comply with the nRF52 spec you need to use 2 GPIOs that are tied together externally and assign them to their respective GPIOTE channel.
+
+
 The nRF52840 has 16-bit buffer sizes for the SPIM peripheral where the nRF52832 only has 8-bit. Even at the lowest SPI frequencies an NEC IR encoded packet will need ~900 bytes. 
 The SPIM's `RXD.LIST <https://infocenter.nordicsemi.com/topic/com.nordic.infocenter.nrf52832.ps.v1.1/spim.html?cp=4_2_0_30_5_11#register.RXD.LIST>`_ register can be used to increase the buffer size to fully capture the whole packet, but it is not implemented.
 See `EasyDMA list <https://infocenter.nordicsemi.com/topic/com.nordic.infocenter.nrf52832.ps.v1.1/spim.html?cp=4_2_0_30_1_0#topic>`_ chapter for more information.
